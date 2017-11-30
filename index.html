@@ -19,8 +19,9 @@
         <div >
 
           <div ng-controller="aventCrtl">
-              <daydraw seed="day1"></daydraw>
+
               <daydraw seed="day2"></daydraw>
+              <daydraw seed="day1"></daydraw>
           </div>
         </div>
     </body>
@@ -30,11 +31,10 @@
     // angular stuff
     angular.module('aventApp',[])
            .controller('aventCrtl', function($scope){
-             $scope.value="Hi";
-             $scope.day1="lundi";
              $scope.day2="mardi";
+             $scope.day1="lundi";
            })
-           .directive('daydraw', function(){
+           .directive('daydraw',['$timeout', function($timeout){
              return {
                scope: {
                  seed: "="
@@ -47,7 +47,7 @@
 
                  // Some Parameters
                  // Play with the Seed to make other plants
-                 var MAX_POP = 80;
+                 var MAX_POP = 8;
                  var SEED = "ABTATBATAAATATBBAT";
 
                  /**
@@ -140,7 +140,7 @@
 
                     var babySpeed = new Point(this.speed.x,this.speed.y);
                     babySpeed.scale(0.4);
-                    babySpeed.rotate(90);
+                    babySpeed.rotate(25);
                     var babyPosition = new Point(this.position.x, this.position.y);
                     var babyJohn =  new Lindenmayer("canvas", babyPosition, babySpeed);
                     babyJohn.start();
@@ -181,18 +181,21 @@
 
                  // Starting point of the script
                  console.log("Starting");
-                 Math.seedrandom('a');
+                 Math.seedrandom($scope.seed);
                  var populationLimit = 0;
-                 A = new Point(300, 480);
-                 V = new Point(0,-60);
+                 A = new Point(80, 60);
+                 V = new Point(10,-10);
                  console.log("===============");
                  console.log($scope.seed);
-                 braun = new Lindenmayer($scope.seed, A, V);
-                 braun.start();
+                 $timeout( function() {
+                   console.log("once");
+                   braun = new Lindenmayer($scope.seed, A, V);
+                   braun.start();
+                 });
 
                }
              }
-           });
+           }]);
     </script>
 
 </html>
