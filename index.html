@@ -8,6 +8,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="seedrandom.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular-route.min.js"></script>
     </head>
     <body>
         <!--[if lte IE 9]>
@@ -19,9 +20,9 @@
         <div >
 
           <div ng-controller="aventCrtl">
-
-              <daydraw seed="day2"></daydraw>
-              <daydraw seed="day1"></daydraw>
+            <div ng-repeat="day in days">
+              <daydraw seed="day" width="width" height="height"></daydraw>
+            </div>
           </div>
         </div>
     </body>
@@ -29,17 +30,37 @@
     <script>
 
     // angular stuff
-    angular.module('aventApp',[])
-           .controller('aventCrtl', function($scope){
-             $scope.day2="mardi";
-             $scope.day1="lundi";
+    angular.module('aventApp',['ngRoute'])
+           .controller('aventCrtl', function($scope, $routeParams){
+              function addDays(theDate, days) {
+                return new Date(theDate.getTime() + days*24*60*60*1000);
+              };
+
+              $scope.days=[];
+              for(var i=0; i<25; i++) {
+                var newDate = addDays(new Date("2017-12-01"), i);
+                var month = newDate.getUTCMonth() + 1; //months from 1-12
+                var day = newDate.getUTCDate();
+                var year = newDate.getUTCFullYear();
+                var fd = year + "/" + month + "/" + day;
+                console.log(fd);
+                $scope.days.push(fd);
+              };
+
+             $scope.width=360;
+             $scope.height=120;
+
+
+
            })
            .directive('daydraw',['$timeout', function($timeout){
              return {
                scope: {
-                 seed: "="
+                 seed: "=",
+                 width: '=',
+                 height: '='
                },
-               template:'<h2>{{seed}}</h2><canvas style="border: 1px solid black;" id="{{seed}}" width="160" height="120"></canvas>',
+               template:'<h2>{{seed}}</h2><canvas style="border: 1px solid black;" id="{{seed}}" width="{{width}}" height="{{height}}"></canvas>',
                link:  function($scope){
                  console.log("******  seed  ***********");
 
@@ -47,8 +68,8 @@
 
                  // Some Parameters
                  // Play with the Seed to make other plants
-                 var MAX_POP = 8;
-                 var SEED = "ABTATBATAAATATBBAT";
+                 var MAX_POP = 60;
+
 
                  /**
                   * Standard geometric objects
@@ -97,9 +118,7 @@
                  class Lindenmayer{
 
                    constructor(canvasId, startingPoint, startingSpeed) {
-                     console.log("-----------------------------");
-                     console.log(canvasId)
-                     this.context = document.getElementById("lundi").getContext("2d");
+                     this.context = document.getElementById(canvasId).getContext("2d");
 
                      this.position = startingPoint;
                      this.speed = startingSpeed;
@@ -108,12 +127,11 @@
                      //this.context.strokeStyle = 'hsl(' + 360 * Math.random() + ', 50%, 50%)';
                      this.context.lineWidth = 1;
 
-                     this.instructions=SEED;
+                     this.instructions=$scope.SEED;
                      this.ticker = {};
                    }
 
                    info() {
-                    console.log("My position is : ");
                     this.position.info();
                   }
 
@@ -136,23 +154,23 @@
                   }
 
                   spawn() {
-                    if (populationLimit > MAX_POP) return (-1);
+                    if ($scope.populationLimit > MAX_POP) return (-1);
 
                     var babySpeed = new Point(this.speed.x,this.speed.y);
-                    babySpeed.scale(0.4);
-                    babySpeed.rotate(25);
+                    babySpeed.scale(0.8);
+                    //babySpeed.rotate(25);
                     var babyPosition = new Point(this.position.x, this.position.y);
-                    var babyJohn =  new Lindenmayer("canvas", babyPosition, babySpeed);
+                    var babyJohn =  new Lindenmayer($scope.seed, babyPosition, babySpeed);
                     babyJohn.start();
 
                    babySpeed = new Point(this.speed.x,this.speed.y);
-                    babySpeed.scale(0.4);
-                    babySpeed.rotate(-90);
+                    babySpeed.scale(0.8);
+                    //babySpeed.rotate(-90);
                     var babyPosition = new Point(this.position.x, this.position.y);
-                    var babyMary =  new Lindenmayer("canvas", babyPosition, babySpeed);
+                    var babyMary =  new Lindenmayer($scope.seed, babyPosition, babySpeed);
                     babyMary.start();
 
-                    populationLimit ++;
+                    $scope.populationLimit ++;
                   }
 
                   obey(){
@@ -168,7 +186,7 @@
                         break;
                       case 'T' :
                         //this.turn(Math.random()>0.5 ? 33 :-33);
-                        this.turn(65-40*Math.random());
+                        this.turn(90 - 180 * Math.random() );
                         break;
                       case 'B' :
                         this.spawn();
@@ -180,17 +198,21 @@
                  }
 
                  // Starting point of the script
-                 console.log("Starting");
+
                  Math.seedrandom($scope.seed);
-                 var populationLimit = 0;
-                 A = new Point(80, 60);
-                 V = new Point(10,-10);
-                 console.log("===============");
-                 console.log($scope.seed);
+                 console.log("First number is "+ Math.random())
+                 $scope.populationLimit = 0;
+                 $scope.SEED = "ATB";
+                 $scope.A = new Point($scope.width / 2, $scope.height / 2);
+                 var vx = 40-80*Math.random();
+                 var vy = 40-80*Math.random();
+                 console.log(vx, vy)
+                 $scope.V = new Point(vx, vy);
+
                  $timeout( function() {
-                   console.log("once");
-                   braun = new Lindenmayer($scope.seed, A, V);
-                   braun.start();
+
+                   $scope.braun = new Lindenmayer($scope.seed, $scope.A, $scope.V);
+                   $scope.braun.start();
                  });
 
                }
