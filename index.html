@@ -6,6 +6,7 @@
         <title></title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"></link>
         <script src="seedrandom.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular-route.min.js"></script>
@@ -15,12 +16,11 @@
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
         <![endif]-->
 
-        <h1>canvas</h1>
 
-        <div >
+        <div class="container-fluid">
 
           <div ng-controller="aventCrtl">
-            <div ng-repeat="day in days">
+            <div class="col-md-4" ng-repeat="day in days">
               <daydraw seed="day" width="width" height="height"></daydraw>
             </div>
           </div>
@@ -32,6 +32,7 @@
     // angular stuff
     angular.module('aventApp',['ngRoute'])
            .controller('aventCrtl', function($scope, $routeParams){
+
               function addDays(theDate, days) {
                 return new Date(theDate.getTime() + days*24*60*60*1000);
               };
@@ -43,13 +44,13 @@
                 var day = newDate.getUTCDate();
                 var year = newDate.getUTCFullYear();
                 var fd = year + "/" + month + "/" + day;
-                console.log(fd);
                 $scope.days.push(fd);
               };
 
              $scope.width=360;
              $scope.height=120;
 
+             console.log($routeParams);
 
 
            })
@@ -62,9 +63,7 @@
                },
                template:'<h2>{{seed}}</h2><canvas style="border: 1px solid black;" id="{{seed}}" width="{{width}}" height="{{height}}"></canvas>',
                link:  function($scope){
-                 console.log("******  seed  ***********");
 
-                 console.log($scope.seed);
 
                  // Some Parameters
                  // Play with the Seed to make other plants
@@ -200,13 +199,11 @@
                  // Starting point of the script
 
                  Math.seedrandom($scope.seed);
-                 console.log("First number is "+ Math.random())
                  $scope.populationLimit = 0;
                  $scope.SEED = "ATB";
                  $scope.A = new Point($scope.width / 2, $scope.height / 2);
                  var vx = 40-80*Math.random();
                  var vy = 40-80*Math.random();
-                 console.log(vx, vy)
                  $scope.V = new Point(vx, vy);
 
                  $timeout( function() {
