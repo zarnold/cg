@@ -1,5 +1,5 @@
 
-<html class="no-js" lang="">
+<html ng-app="aventApp" class="no-js" lang="">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -7,6 +7,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="seedrandom.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.6.5/angular.min.js"></script>
     </head>
     <body>
         <!--[if lte IE 9]>
@@ -14,156 +15,184 @@
         <![endif]-->
 
         <h1>canvas</h1>
-        <canvas style="border: 1px solid black;" id="canvas" width="640" height="480"></canvas>
 
+        <div >
+
+          <div ng-controller="aventCrtl">
+              <daydraw seed="day1"></daydraw>
+              <daydraw seed="day2"></daydraw>
+          </div>
+        </div>
     </body>
 
     <script>
-    // Some Parameters
-    // Play with the Seed to make other plants
-    var MAX_POP = 80;
-    var SEED = "ABTATBATAAATATBBAT";
 
-    /**
-     * Standard geometric objects
-     */
-    class Point{
+    // angular stuff
+    angular.module('aventApp',[])
+           .controller('aventCrtl', function($scope){
+             $scope.value="Hi";
+             $scope.day1="lundi";
+             $scope.day2="mardi";
+           })
+           .directive('daydraw', function(){
+             return {
+               scope: {
+                 seed: "="
+               },
+               template:'<h2>{{seed}}</h2><canvas style="border: 1px solid black;" id="{{seed}}" width="160" height="120"></canvas>',
+               link:  function($scope){
+                 console.log("******  seed  ***********");
 
-      //note : point and vector are same things
-      constructor(x,y) {
+                 console.log($scope.seed);
 
-        this.x = x || 0;
-        this.y = y || 0;
-      }
+                 // Some Parameters
+                 // Play with the Seed to make other plants
+                 var MAX_POP = 80;
+                 var SEED = "ABTATBATAAATATBBAT";
 
-      info() {
-        console.log("Point : "+this.x+","+this.y);
-      }
+                 /**
+                  * Standard geometric objects
+                  */
+                 class Point{
 
-     add(vector) {
-       this.x += vector.x;
-       this.y += vector.y;
-     }
+                   //note : point and vector are same things
+                   constructor(x,y) {
 
-     rotate(angle) {
-      var ang = angle * (Math.PI/180);
-      var cos = Math.cos(ang);
-      var sin = Math.sin(ang);
-      var x = 0;
-      var y = 0;
-      x = Math.round(10000*(this.x * cos - this.y * sin))/10000;
-      y = Math.round(10000*(this.x * sin + this.y * cos))/10000;
-      this.x = x;
-      this.y = y;
-     }
-     scale(factor) {
-       this.x = this.x * factor;
-       this.y = this.y * factor;
-     }
-    }
+                     this.x = x || 0;
+                     this.y = y || 0;
+                   }
 
+                   info() {
+                     console.log("Point : "+this.x+","+this.y);
+                   }
 
-    /**
-     * OOP linden mayer
-     * small dudes that paint canvas
-     * following a string of instructions
-     */
-    class Lindenmayer{
+                  add(vector) {
+                    this.x += vector.x;
+                    this.y += vector.y;
+                  }
 
-      constructor(canvasId, startingPoint, startingSpeed) {
-        console.log("New linden");
-
-
-        this.context = document.getElementById("canvas").getContext("2d");
-
-        this.position = startingPoint;
-        this.speed = startingSpeed;
-
-        this.context.strokeStyle = 'hsl(' + 360 * Math.random() + ', 50%, 50%)';
-        //this.context.strokeStyle = 'hsl(' + 360 * Math.random() + ', 50%, 50%)';
-        this.context.lineWidth = 1;
-
-        this.instructions=SEED;
-        this.ticker = {};
-      }
-
-      info() {
-       console.log("My position is : ");
-       this.position.info();
-     }
-
-     step() {
-       this.context.beginPath();
-       this.context.moveTo(this.position.x, this.position.y);
-       this.position.add(this.speed);
-       this.context.lineTo(this.position.x, this.position.y);
-       this.context.stroke();
-     }
+                  rotate(angle) {
+                   var ang = angle * (Math.PI/180);
+                   var cos = Math.cos(ang);
+                   var sin = Math.sin(ang);
+                   var x = 0;
+                   var y = 0;
+                   x = Math.round(10000*(this.x * cos - this.y * sin))/10000;
+                   y = Math.round(10000*(this.x * sin + this.y * cos))/10000;
+                   this.x = x;
+                   this.y = y;
+                  }
+                  scale(factor) {
+                    this.x = this.x * factor;
+                    this.y = this.y * factor;
+                  }
+                 }
 
 
-     turn(d) {
-       this.speed.rotate(d);
-     }
+                 /**
+                  * OOP linden mayer
+                  * small dudes that paint canvas
+                  * following a string of instructions
+                  */
+                 class Lindenmayer{
 
-     start() {
-             var self = this;
-             this.ticker = setInterval( function(){self.obey()}, 20);
-     }
+                   constructor(canvasId, startingPoint, startingSpeed) {
+                     console.log("-----------------------------");
+                     console.log(canvasId)
+                     this.context = document.getElementById("lundi").getContext("2d");
 
-     spawn() {
-       if (populationLimit > MAX_POP) return (-1);
+                     this.position = startingPoint;
+                     this.speed = startingSpeed;
 
-       var babySpeed = new Point(this.speed.x,this.speed.y);
-       babySpeed.scale(0.4);
-       babySpeed.rotate(90);
-       var babyPosition = new Point(this.position.x, this.position.y);
-       var babyJohn =  new Lindenmayer("canvas", babyPosition, babySpeed);
-       babyJohn.start();
+                     this.context.strokeStyle = 'hsl(' + 360 * Math.random() + ', 50%, 50%)';
+                     //this.context.strokeStyle = 'hsl(' + 360 * Math.random() + ', 50%, 50%)';
+                     this.context.lineWidth = 1;
 
-      babySpeed = new Point(this.speed.x,this.speed.y);
-       babySpeed.scale(0.4);
-       babySpeed.rotate(-90);
-       var babyPosition = new Point(this.position.x, this.position.y);
-       var babyMary =  new Lindenmayer("canvas", babyPosition, babySpeed);
-       babyMary.start();
+                     this.instructions=SEED;
+                     this.ticker = {};
+                   }
 
-       populationLimit ++;
-     }
+                   info() {
+                    console.log("My position is : ");
+                    this.position.info();
+                  }
 
-     obey(){
-       if (this.instructions.length == 0 ) clearInterval(this.ticker);
-
-       var instruction = this.instructions[0];
-       this.instructions = this.instructions.slice(1);
-
-       // Not that elegant...
-       switch(instruction) {
-         case 'A' :
-           this.step();
-           break;
-         case 'T' :
-           //this.turn(Math.random()>0.5 ? 33 :-33);
-           this.turn(65-40*Math.random());
-           break;
-         case 'B' :
-           this.spawn();
-           break;
-         default :
-           this.step();
-       };
-     }
+                  step() {
+                    this.context.beginPath();
+                    this.context.moveTo(this.position.x, this.position.y);
+                    this.position.add(this.speed);
+                    this.context.lineTo(this.position.x, this.position.y);
+                    this.context.stroke();
+                  }
 
 
-    }
+                  turn(d) {
+                    this.speed.rotate(d);
+                  }
 
-    // Starting point of the script
-    console.log("Starting");
-    Math.seedrandom('a');
-    var populationLimit = 0;
-    A = new Point(300, 480);
-    V = new Point(0,-60);
-    braun = new Lindenmayer("canvas", A, V);
-    braun.start();
+                  start() {
+                          var self = this;
+                          this.ticker = setInterval( function(){self.obey()}, 20);
+                  }
+
+                  spawn() {
+                    if (populationLimit > MAX_POP) return (-1);
+
+                    var babySpeed = new Point(this.speed.x,this.speed.y);
+                    babySpeed.scale(0.4);
+                    babySpeed.rotate(90);
+                    var babyPosition = new Point(this.position.x, this.position.y);
+                    var babyJohn =  new Lindenmayer("canvas", babyPosition, babySpeed);
+                    babyJohn.start();
+
+                   babySpeed = new Point(this.speed.x,this.speed.y);
+                    babySpeed.scale(0.4);
+                    babySpeed.rotate(-90);
+                    var babyPosition = new Point(this.position.x, this.position.y);
+                    var babyMary =  new Lindenmayer("canvas", babyPosition, babySpeed);
+                    babyMary.start();
+
+                    populationLimit ++;
+                  }
+
+                  obey(){
+                    if (this.instructions.length == 0 ) clearInterval(this.ticker);
+
+                    var instruction = this.instructions[0];
+                    this.instructions = this.instructions.slice(1);
+
+                    // Not that elegant...
+                    switch(instruction) {
+                      case 'A' :
+                        this.step();
+                        break;
+                      case 'T' :
+                        //this.turn(Math.random()>0.5 ? 33 :-33);
+                        this.turn(65-40*Math.random());
+                        break;
+                      case 'B' :
+                        this.spawn();
+                        break;
+                      default :
+                        this.step();
+                    };
+                  }
+                 }
+
+                 // Starting point of the script
+                 console.log("Starting");
+                 Math.seedrandom('a');
+                 var populationLimit = 0;
+                 A = new Point(300, 480);
+                 V = new Point(0,-60);
+                 console.log("===============");
+                 console.log($scope.seed);
+                 braun = new Lindenmayer($scope.seed, A, V);
+                 braun.start();
+
+               }
+             }
+           });
     </script>
 
 </html>
