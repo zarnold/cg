@@ -6,7 +6,7 @@
         <title></title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-
+        <script src="seedrandom.min.js"></script>
     </head>
     <body>
         <!--[if lte IE 9]>
@@ -21,8 +21,8 @@
     <script>
     // Some Parameters
     // Play with the Seed to make other plants
-    var MAX_POP = 600;
-    var SEED = "ABTATBATBAT";
+    var MAX_POP = 80;
+    var SEED = "ABTATBATAAATATBBAT";
 
     /**
      * Standard geometric objects
@@ -143,7 +143,7 @@
            break;
          case 'T' :
            //this.turn(Math.random()>0.5 ? 33 :-33);
-           this.turn(20);
+           this.turn(65-40*Math.random());
            break;
          case 'B' :
            this.spawn();
@@ -158,7 +158,7 @@
 
     // Starting point of the script
     console.log("Starting");
-
+    Math.seedrandom('a');
     var populationLimit = 0;
     A = new Point(300, 480);
     V = new Point(0,-60);
